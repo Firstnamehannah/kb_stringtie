@@ -60,9 +60,10 @@ class StringTieUtil:
         "min_length": "-m",
         "min_read_coverage": "-c",
         "min_isoform_abundance": "-f",
+        "mix": "--mix"
     }
 
-    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref"]
+    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref", "mix"]
 
     def _validate_run_stringtie_params(self, params):
         """
@@ -109,8 +110,13 @@ class StringTieUtil:
                 option_value = " "
             if option_value:
                 command += "{} {} ".format(option, option_value)
-
-        command += "{} ".format(params.get("input_file"))
+        if params.get("mix"):
+                command += "{} {} ".format(
+                    params.get("input_file"),
+                    params.get("long_read_input_file")
+                )
+        else:
+            command += "{} ".format(params.get("input_file"))
 
         log("generated stringtie command: {}".format(command))
 
@@ -772,6 +778,18 @@ class StringTieUtil:
         else:
             shutil.copy(params.get("gtf_file"), result_directory)
         params["input_file"] = self._get_input_file(alignment_ref)
+
+        if params.get("mix"):
+            long_read_alignment_ref = params.get("long_read_alignment_object_ref")
+
+            if not long_read_alignment_ref:
+                raise ValueError(
+                    "long_read_alignment_object_ref is required when mix is selected."
+                )
+
+            params["long_read_input_file"] = self._get_input_file(long_read_alignment_ref)
+
+
         log("using {} as reference annotation file.".format(params.get("gtf_file")))
 
         # output files
