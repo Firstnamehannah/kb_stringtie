@@ -1,4 +1,4 @@
-FROM kbase/sdkbase2:python
+FROM kbase/sdkpython:3.8.0
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
@@ -23,9 +23,9 @@ RUN pip install coverage==5.5 && \
 
 # download StringTie software and untar it
 RUN STRINGTIE_V='3.0.3' && \
-    mkdir /kb/deployment/bin/modules && \
+    mkdir -p /kb/deployment/bin/modules && \
     cd /kb/deployment/bin/modules && \
-    mkdir StringTie && cd StringTie && \
+    mkdir -p StringTie && cd StringTie && \
     wget https://ccb.jhu.edu/software/stringtie/dl/stringtie-${STRINGTIE_V}.Linux_x86_64.tar.gz &&\
     tar xvfz stringtie-${STRINGTIE_V}.Linux_x86_64.tar.gz && \
     cd stringtie-${STRINGTIE_V}.Linux_x86_64 && \
