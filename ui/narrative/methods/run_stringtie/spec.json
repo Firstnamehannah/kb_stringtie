@@ -20,7 +20,7 @@
     }
   },
   {
-  "id" : "mix",
+  "id" : "mix_mode",
   "optional" : true,
   "advanced" : true,
   "allow_multiple" : false,
@@ -41,7 +41,20 @@
   "text_options" : {
     "valid_ws_types" : ["KBaseRNASeq.RNASeqAlignment"]
   }
-},{
+},  
+{
+  "id" : "long_read_mode",
+  "optional" : true,
+  "advanced" : true,
+  "allow_multiple" : false,
+  "default_values" : [ "0" ],
+  "field_type" : "checkbox",
+  "checkbox_options" : {
+    "checked_value" : 1,
+    "unchecked_value" : 0
+  }
+},
+{
     "id" : "expression_suffix",
     "optional" : false,
     "advanced" : true,
@@ -132,14 +145,18 @@
           "target_property" : "alignment_object_ref"
         },
         {
-          "input_parameter" : "mix",
-          "target_property" : "mix"
+          "input_parameter" : "mix_mode",
+          "target_property" : "mix_mode"
         },
         {
           "input_parameter" : "long_read_alignment_object_ref",
           "target_type_transform": "resolved-ref",
           "target_property" : "long_read_alignment_object_ref"
-        },       
+        },    
+        {
+          "input_parameter" : "long_read_mode",
+          "target_property" : "long_read_mode"
+        },             
         {
             "input_parameter" : "expression_suffix",
             "target_property" : "expression_suffix"

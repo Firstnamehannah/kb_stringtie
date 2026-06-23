@@ -10,7 +10,6 @@ try:
 except:
     from configparser import ConfigParser  # py3
 
-from biokbase.workspace.client import Workspace as workspaceService
 from installed_clients.WorkspaceClient import Workspace as Workspace
 from kb_stringtie.kb_stringtieImpl import kb_stringtie
 from kb_stringtie.kb_stringtieServer import MethodContext
@@ -49,7 +48,7 @@ class kb_stringtie_ciTest(unittest.TestCase):
                              }],
                         'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
-        cls.wsClient = workspaceService(cls.wsURL)
+        cls.wsClient = Workspace(cls.wsURL, token=token)
         cls.ws = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = kb_stringtie(cls.cfg)
         cls.scratch = cls.cfg['scratch']

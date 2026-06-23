@@ -60,10 +60,11 @@ class StringTieUtil:
         "min_length": "-m",
         "min_read_coverage": "-c",
         "min_isoform_abundance": "-f",
-        "mix": "--mix"
+        "mix_mode": "--mix",
+        "long_read_mode": "-L"
     }
 
-    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref", "mix"]
+    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref", "mix_mode", "long_read_mode"]
 
     def _validate_run_stringtie_params(self, params):
         """
@@ -104,17 +105,32 @@ class StringTieUtil:
 
         command = self.STRINGTIE_TOOLKIT_PATH + "/stringtie "
 
+        # validation
+        if params.get("mix_mode") and params.get("long_read_mode"):
+            raise ValueError(
+                "mix_mode and long_read_mode cannot both be enabled"
+            )
+
+        if params.get("mix_mode") and not params.get("long_read_input_file"):
+            raise ValueError(
+                "long_read_input_file is required when mix_mode is selected"
+            )
+
         for key, option in list(self.OPTIONS_MAP.items()):
             option_value = params.get(key)
+
             if key in self.BOOLEAN_OPTIONS and option_value:
                 option_value = " "
+
             if option_value:
                 command += "{} {} ".format(option, option_value)
-        if params.get("mix"):
-                command += "{} {} ".format(
-                    params.get("input_file"),
-                    params.get("long_read_input_file")
-                )
+
+        # BAM files must come last
+        if params.get("mix_mode"):
+            command += "{} {} ".format(
+                params.get("input_file"),
+                params.get("long_read_input_file")
+            )
         else:
             command += "{} ".format(params.get("input_file"))
 
@@ -779,7 +795,7 @@ class StringTieUtil:
             shutil.copy(params.get("gtf_file"), result_directory)
         params["input_file"] = self._get_input_file(alignment_ref)
 
-        if params.get("mix"):
+        if params.get("mix_mode"):
             long_read_alignment_ref = params.get("long_read_alignment_object_ref")
 
             if not long_read_alignment_ref:
@@ -1156,6 +1172,15 @@ class StringTieUtil:
         )
 
         self._validate_run_stringtie_params(params)
+
+        if params.get("mix_mode") and params.get("long_read_mode"):
+            raise ValueError("mix_mode and long_read_mode cannot both be enabled")
+
+        if params.get("mix_mode") and not params.get("long_read_alignment_object_ref"):
+            raise ValueError(
+                "long_read_alignment_object_ref is required when mix_mode is selected"
+            )      
+
         if (
             isinstance(params.get("novel_isoforms"), dict)
             and "transcript_label" in params["novel_isoforms"]

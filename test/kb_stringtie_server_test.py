@@ -11,8 +11,7 @@ from configparser import ConfigParser
 
 from pprint import pprint  # noqa: F401
 
-from biokbase.workspace.client import Workspace as workspaceService
-from installed_clients.WorkspaceClient import Workspace as Workspace
+from installed_clients.WorkspaceClient import Workspace as Workspace 
 from kb_stringtie.kb_stringtieImpl import kb_stringtie
 from kb_stringtie.kb_stringtieServer import MethodContext
 from kb_stringtie.authclient import KBaseAuth as _KBaseAuth
@@ -53,7 +52,7 @@ class kb_stringtieTest(unittest.TestCase):
                              }],
                         'authenticated': 1})
         cls.wsURL = cls.cfg['workspace-url']
-        cls.wsClient = workspaceService(cls.wsURL)
+        cls.wsClient = Workspace(cls.wsURL, token=token)
         cls.ws = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = kb_stringtie(cls.cfg)
         cls.scratch = cls.cfg['scratch']
@@ -377,7 +376,6 @@ class kb_stringtieTest(unittest.TestCase):
             'gtf_file': 'gtf_file',
             'cov_refs_file': 'cov_refs_file'
         }
-
         expect_command = '/kb/deployment/bin/StringTie/stringtie '
         expect_command += '-o output_transcripts_file -A gene_abundances_file '
         expect_command += '-p 4 -C cov_refs_file -a 8 -j 0.8 -t   -g 60 -B   -e   '
@@ -387,6 +385,64 @@ class kb_stringtieTest(unittest.TestCase):
 
         self.assertEquals(command, expect_command)
 
+        #added tests for long read mode and mix mode
+    def test_StringTieUtil_generate_command_long_read_mode(self):
+        command_params = {
+            'output_transcripts': 'out.gtf',
+            'gene_abundances_file': 'genes.tsv',
+            'input_file': 'long_reads.bam',
+            'long_read_mode': True
+        }
+
+        command = self.stringtie_runner._generate_command(command_params)
+
+        self.assertIn('-L', command)
+        self.assertIn('long_reads.bam', command)
+        self.assertNotIn('--mix', command)
+
+    def test_StringTieUtil_generate_command_mix(self):
+        command_params = {
+            'output_transcripts': 'out.gtf',
+            'gene_abundances_file': 'genes.tsv',
+            'input_file': 'short_reads.bam',
+            'long_read_input_file': 'long_reads.bam',
+            'mix_mode': True
+        }
+
+        command = self.stringtie_runner._generate_command(command_params)
+
+        self.assertIn('--mix', command)
+        self.assertIn('short_reads.bam', command)
+        self.assertIn('long_reads.bam', command)
+        self.assertNotIn('-L', command)
+
+    def test_StringTieUtil_generate_command_mix_missing_long_read_file(self):
+        command_params = {
+            'output_transcripts': 'out.gtf',
+            'gene_abundances_file': 'genes.tsv',
+            'input_file': 'short_reads.bam',
+            'mix_mode': True
+        }
+
+        with self.assertRaisesRegex(
+                ValueError,
+                "long_read_input_file is required when mix_mode is selected"):
+            self.stringtie_runner._generate_command(command_params)
+
+    def test_StringTieUtil_generate_command_mix_and_long_read_mode(self):
+        command_params = {
+            'output_transcripts': 'out.gtf',
+            'gene_abundances_file': 'genes.tsv',
+            'input_file': 'short_reads.bam',
+            'long_read_input_file': 'long_reads.bam',
+            'mix_mode': True,
+            'long_read_mode': True
+        }
+
+        with self.assertRaisesRegex(
+                ValueError,
+                "mix_mode and long_read_mode cannot both be enabled"):
+            self.stringtie_runner._generate_command(command_params)
     def test_run_stringtie_app_alignment(self):
         input_params = {
             'alignment_object_ref': self.alignment_ref_1,
@@ -423,6 +479,37 @@ class kb_stringtieTest(unittest.TestCase):
                                                )['data'][0]['data']
         self.assertEqual(expression_data.get('genome_id'), self.genome_ref)
         self.assertEqual(expression_data.get('condition'), self.condition_1)
+
+        #added tests for long read mode and mix mode
+    def test_run_stringtie_app_mix_missing_long_read_alignment(self):
+        input_params = {
+            'alignment_object_ref': self.alignment_ref_1,
+            'workspace_name': self.getWsName(),
+            'expression_suffix': '_expression',
+            'expression_set_suffix': '_expression_set',
+            'mix_mode': 1
+        }
+
+        with self.assertRaisesRegex(
+                ValueError,
+                "long_read_alignment_object_ref is required when mix_mode is selected"):
+            self.getImpl().run_stringtie_app(self.getContext(), input_params)
+
+    def test_run_stringtie_app_mix_and_long_read_mode(self):
+        input_params = {
+            'alignment_object_ref': self.alignment_ref_1,
+            'workspace_name': self.getWsName(),
+            'expression_suffix': '_expression',
+            'expression_set_suffix': '_expression_set',
+            'mix_mode': 1,
+            'long_read_mode': 1,
+            'long_read_alignment_object_ref': self.alignment_ref_2
+        }
+
+        with self.assertRaisesRegex(
+                ValueError,
+                "mix_mode and long_read_mode cannot both be enabled"):
+            self.getImpl().run_stringtie_app(self.getContext(), input_params)        
 
     def test_run_stringtie_app_alignment_with_AMA_data_only(self):
         input_params = {
