@@ -52,6 +52,7 @@ module kb_stringtie {
         string expression_set_suffix;
         string expression_suffix;
 
+
         int num_threads;
         int junction_base;
         float junction_coverage;
