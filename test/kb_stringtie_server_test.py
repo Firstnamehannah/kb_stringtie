@@ -67,16 +67,14 @@ class kb_stringtieTest(unittest.TestCase):
 
         cls.stringtie_runner = StringTieUtil(cls.cfg)
 
-# TEST TEST TEST
-
         suffix = int(time.time() * 1000)
         #cls.wsName = "test_kb_stringtie_" + str(suffix)
         #kncls.wsClient.create_workspace({'workspace': cls.wsName})
 
-        # use existing Narrative workspace + existing alignment refs
-        cls.wsName = "keenholdhc:narrative_1782222319261"
-        cls.alignment_ref_1 = "77421/17/1"
-        cls.alignment_ref_2 = "77421/18/1"
+        # use existing Narrative workspace and existing alignment refs
+        cls.wsName = "keenholdhc:narrative_1783354693345"
+        cls.alignment_ref_1 = "77518/7/1"
+        cls.alignment_ref_2 = "77518/9/1"
 
         # cls.prepare_data()
         # cls.prepare_ama_data()
@@ -127,11 +125,11 @@ class kb_stringtieTest(unittest.TestCase):
 
         # run stringtie(dev version) with 'generate_ws_object':False
 
-        # TESTING HANNAHS NARRATIVE 
+        # test Hannah'sstringtie3 narrative
         cls.kb_stringtie_runner = kb_stringtie_runner(cls.callback_url, service_ver='dev')
         ret = cls.kb_stringtie_runner.run_stringtie_app({
-            'alignment_object_ref':"77421/17/1",
-            'workspace_name': "keenholdhc:narrative_1782222319261",
+            'alignment_object_ref':"77518/7/1",
+            'workspace_name': "keenholdhc:narrative_1783354693345",
             'expression_suffix': '_stringtie_expression',
             'expression_set_suffix': '_stringtie_expression_set',
             'generate_ws_object': False})
@@ -395,7 +393,7 @@ class kb_stringtieTest(unittest.TestCase):
 
     #     self.assertEquals(command, expect_command)
 
-    # added tests for long read mode and mix mode
+    # added tests for long_read_mode and mix_mode
     def test_StringTieUtil_generate_command_long_read_mode(self):
         command_params = {
             'output_transcripts': 'out.gtf',
@@ -453,54 +451,9 @@ class kb_stringtieTest(unittest.TestCase):
                 
             self.stringtie_runner._generate_command(command_params)        
 
-    # def test_run_stringtie_app_alignment(self):
-    #     input_params = {
-    #         'alignment_object_ref': self.alignment_ref_1,
-    #         'workspace_name': self.getWsName(),
-    #         'expression_suffix': '_stringtie_expression',
-    #         'expression_set_suffix': '_stringtie_expression_set',
 
-    #         "min_read_coverage": 2.5,
-    #         "junction_base": 10,
-    #         "num_threads": 2,
-    #         "min_isoform_abundance": 0.1,
-    #         "min_length": 200,
-    #         "skip_reads_with_no_ref": 1,
-    #         "merge": 0,
-    #         "junction_coverage": 1,
-    #         "ballgown_mode": 1,
-    #         "min_locus_gap_sep_value": 50,
-    #         "disable_trimming": 1
-    #     }
 
-    #     result = self.getImpl().run_stringtie_app(self.getContext(), input_params)[0]
-
-    #     self.assertTrue('result_directory' in result)
-    #     result_files = os.listdir(result['result_directory'])
-    #     print(result_files)
-    #     expect_result_files = ['genes.fpkm_tracking', 'transcripts.gtf',
-    #                            'e2t.ctab', 'e_data.ctab', 'i2t.ctab', 'i_data.ctab', 't_data.ctab']
-    #     self.assertTrue(all(x in result_files for x in expect_result_files))
-    #     self.assertTrue('expression_obj_ref' in result)
-    #     self.assertTrue('report_name' in result)
-    #     self.assertTrue('report_ref' in result)
-    #     expression_data = self.ws.get_objects2({'objects':
-    #                                            [{'ref': result.get('expression_obj_ref')}]}
-    #                                            )['data'][0]['data']
-    #     self.assertEqual(expression_data.get('genome_id'), self.genome_ref)
-    #     self.assertEqual(expression_data.get('condition'), self.condition_1)
-
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
     # added tests for long read mode and mix mode
-
     def test_run_stringtie_app_mix_missing_long_read_alignment(self):
         input_params = {
             'alignment_object_ref': self.alignment_ref_1,
@@ -509,7 +462,6 @@ class kb_stringtieTest(unittest.TestCase):
             'expression_set_suffix': '_expression_set',
             'mix_mode': 1
         }
-
         with self.assertRaisesRegex(
                 ValueError,
                 "long_read_alignment_object_ref is required when mix_mode is selected"):
@@ -525,23 +477,23 @@ class kb_stringtieTest(unittest.TestCase):
             'long_read_mode': 1,
             'long_read_alignment_object_ref': self.alignment_ref_2
         }
-
         with self.assertRaisesRegex(
                 ValueError,
                 "mix_mode and long_read_mode cannot both be enabled"):
             self.getImpl().run_stringtie_app(self.getContext(), input_params) 
 
     def test_run_stringtie_app_mix_with_long_read_alignment(self):
-      # inspect the alignment objects
-        # info = self.ws.get_object_info3({
-        #     "objects": [
-        #         {"ref": self.alignment_ref_1},
-        #         {"ref": self.alignment_ref_2}
-        #     ]
-        # })["infos"]
 
-        # print("SHORT READ OBJECT INFO:", info[0])
-        # print("LONG READ OBJECT INFO:", info[1])
+      # inspect the alignment objects
+        info = self.ws.get_object_info3({
+            "objects": [
+                {"ref": self.alignment_ref_1},
+                {"ref": self.alignment_ref_2}
+            ]
+        })["infos"]
+
+        print("kOBJECT INFO:", info[0])
+        print("LONG READ OBJECT INFO:", info[1])
 
         short_set = self.ws.get_objects2({
             "objects": [{"ref": self.alignment_ref_1}]

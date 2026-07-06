@@ -129,3 +129,7 @@ publications :
         display-text: |
             Trapnell C, Roberts A, Goff L, Pertea G, Kim D, Kelley DR, et al. Differential gene and transcript expression analysis of RNA-seq experiments with TopHat and Cufflinks. Nat Protoc. 2012;7: 562–578. doi:10.1038/nprot.2012.016
         link: https://www.nature.com/articles/nprot.2012.016
+    -
+        display-text: |
+            Varabyou A, Pertea G, Pertea M. Improved transcriptome assembly using a hybrid of long and short reads with StringTie. PLOS Computational Biology. 2022;18(6):e1009730. doi:10.1371/journal.pcbi.1009730
+        link: https://doi.org/10.1371/journal.pcbi.1009730
