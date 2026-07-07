@@ -492,7 +492,7 @@ class kb_stringtieTest(unittest.TestCase):
             ]
         })["infos"]
 
-        print("kOBJECT INFO:", info[0])
+        print("OBJECT INFO:", info[0])
         print("LONG READ OBJECT INFO:", info[1])
 
         short_set = self.ws.get_objects2({
@@ -514,7 +514,8 @@ class kb_stringtieTest(unittest.TestCase):
             "expression_set_suffix": "_mix_expression_set",
             "mix_mode": 1,
             "long_read_mode": 0,
-            "num_threads": 2
+            "num_threads": 2,
+            "skip_reads_with_no_ref": 1
         }
 
         result = self.getImpl().run_stringtie_app(self.getContext(), input_params)[0]
