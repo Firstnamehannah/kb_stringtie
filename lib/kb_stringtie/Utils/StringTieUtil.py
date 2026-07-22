@@ -920,32 +920,38 @@ class StringTieUtil:
             short_items = alignment_set["data"]["items"]
             long_items = long_read_alignment_set["data"]["items"]
 
-            # # files must have same number of alignments
-            # if len(short_items) != len(long_items):
-            #     raise ValueError(
-            #         "Short-read and long-read alignment sets must contain the same number of alignments"
-            #     )
-
-            long_alignment_by_label = {}
-
-            for long_alignment in long_items:
-                long_label = long_alignment["label"]
-                long_alignment_by_label[long_label] = long_alignment["ref_path"]
-
-            for short_alignment in short_items:
-                short_alignment_ref = short_alignment["ref_path"]
-                short_label = short_alignment["label"]
-
-                if short_label not in long_alignment_by_label:
-                    raise ValueError(
-                        "No matching long-read alignment found for condition {}".format(short_label)
-                    )
-
+            # files must have same number of alignments
+            if len(short_items) != len(long_items):
+                raise ValueError(
+                    "Short-read and long-read alignment sets must contain the same number of alignments"
+                    "({} vs {})".format(len(short_items), len(long_items))
+                )
+            for short_alignment, long_alignment in zip(short_items, long_items):
                 alignment_upload_params = params.copy()
-                alignment_upload_params["alignment_ref"] = short_alignment_ref
-                alignment_upload_params["long_read_alignment_ref"] = long_alignment_by_label[short_label]
+                alignment_upload_params["alignment_ref"] = short_alignment["ref_path"]
+                alignment_upload_params["long_read_alignment_ref"] = long_alignment["ref_path"]
+                mul_processor_params.append(alignment_upload_params)    
 
-                mul_processor_params.append(alignment_upload_params)
+            # long_alignment_by_label = {}
+
+            # for long_alignment in long_items:
+            #     long_label = long_alignment["label"]
+            #     long_alignment_by_label[long_label] = long_alignment["ref_path"]
+
+            # for short_alignment in short_items:
+            #     short_alignment_ref = short_alignment["ref_path"]
+            #     short_label = short_alignment["label"]
+
+            #     if short_label not in long_alignment_by_label:
+            #         raise ValueError(
+            #             "No matching long-read alignment found for condition {}".format(short_label)
+            #         )
+
+            #     alignment_upload_params = params.copy()
+            #     alignment_upload_params["alignment_ref"] = short_alignment_ref
+            #     alignment_upload_params["long_read_alignment_ref"] = long_alignment_by_label[short_label]
+
+            #     mul_processor_params.append(alignment_upload_params)
 
         # if not in mix_mode, process each alignment individually
         else:
@@ -1147,7 +1153,7 @@ class StringTieUtil:
                 "generate_ws_object": True,
                 "exchange_gene_ids": 0,
                 "ballgown_mode": 1,
-                "skip_reads_with_no_ref": 1,
+                "skip_reads_with_no_ref": 0,
             }
         )
         returnVal = self._process_alignment_set_object(params)

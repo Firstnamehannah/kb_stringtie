@@ -72,9 +72,9 @@ class kb_stringtieTest(unittest.TestCase):
         #kncls.wsClient.create_workspace({'workspace': cls.wsName})
 
         # use existing Narrative workspace and existing alignment refs
-        cls.wsName = "keenholdhc:narrative_1783354693345"
-        cls.alignment_ref_1 = "77518/7/1"
-        cls.alignment_ref_2 = "77518/9/1"
+        cls.wsName = "keenholdhc:narrative_1783967971352"
+        cls.alignment_ref_1 = "265059/37/1"
+        cls.alignment_ref_2 = "265059/35/2"
 
         # cls.prepare_data()
         # cls.prepare_ama_data()
@@ -128,8 +128,8 @@ class kb_stringtieTest(unittest.TestCase):
         # test Hannah'sstringtie3 narrative
         cls.kb_stringtie_runner = kb_stringtie_runner(cls.callback_url, service_ver='dev')
         ret = cls.kb_stringtie_runner.run_stringtie_app({
-            'alignment_object_ref':"77518/7/1",
-            'workspace_name': "keenholdhc:narrative_1783354693345",
+            'alignment_object_ref':"265059/37/1",
+            'workspace_name': "keenholdhc:narrative_1783967971352",
             'expression_suffix': '_stringtie_expression',
             'expression_set_suffix': '_stringtie_expression_set',
             'generate_ws_object': False})
@@ -514,8 +514,7 @@ class kb_stringtieTest(unittest.TestCase):
             "expression_set_suffix": "_mix_expression_set",
             "mix_mode": 1,
             "long_read_mode": 0,
-            "num_threads": 2,
-            "skip_reads_with_no_ref": 1
+            "num_threads": 2
         }
 
         result = self.getImpl().run_stringtie_app(self.getContext(), input_params)[0]

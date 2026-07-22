@@ -1,0 +1,386 @@
+
+Validating module in (/home/ac.keenholdhc/scratch/kb_stringtie)
+
+Validating method in (/home/ac.keenholdhc/scratch/kb_stringtie/ui/narrative/methods/run_stringtie)
+
+
+Congrats- this module is valid.
+
+
+Delete old Docker containers
+bd37bb76166c
+
+Build Docker image
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.79kB done
+#1 WARN: MaintainerDeprecated: Maintainer instruction is deprecated in favor of using label (line 2)
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/kbase/sdkpython:3.8.0
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 59B done
+#3 DONE 0.1s
+
+#4 [ 1/14] FROM docker.io/kbase/sdkpython:3.8.0@sha256:dd03b21793a382ac3b27c9c700df5607b308e903d0be460695846a145f3468f2
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 22.15MB 0.4s done
+#5 DONE 0.5s
+
+#6 [ 8/14] RUN GFFREAD_V='0.12.6' &&     cd /kb/deployment/bin/modules &&     mkdir gffread && cd gffread &&     wget https://ccb.jhu.edu/software/stringtie/dl/gffread-${GFFREAD_V}.Linux_x86_64.tar.gz &&    tar xvfz gffread-${GFFREAD_V}.Linux_x86_64.tar.gz &&     cd gffread-${GFFREAD_V}.Linux_x86_64 &&     mkdir /kb/deployment/bin/gffread &&     cp -R gffread /kb/deployment/bin/gffread/gffread
+#6 CACHED
+
+#7 [ 3/14] RUN apt-get install -y gcc wget
+#7 CACHED
+
+#8 [ 5/14] RUN pip install coverage==5.5 &&     pip install in_place==0.5.0 &&     pip install pathos==0.2.7
+#8 CACHED
+
+#9 [ 7/14] RUN cd /kb/deployment/bin/modules &&     mkdir prepDE && cd prepDE &&     wget https://ccb.jhu.edu/software/stringtie/dl/prepDE.py3 &&    mkdir /kb/deployment/bin/prepDE &&     cp -R prepDE.py3 /kb/deployment/bin/prepDE/prepDE.py &&     chmod 777 /kb/deployment/bin/prepDE/prepDE.py
+#9 CACHED
+
+#10 [ 2/14] RUN apt-get update --fix-missing
+#10 CACHED
+
+#11 [ 4/14] RUN pip install --upgrade pip     && python --version
+#11 CACHED
+
+#12 [ 6/14] RUN STRINGTIE_V='3.0.3' &&     mkdir -p /kb/deployment/bin/modules &&     cd /kb/deployment/bin/modules &&     mkdir StringTie && cd StringTie &&     wget https://ccb.jhu.edu/software/stringtie/dl/stringtie-${STRINGTIE_V}.Linux_x86_64.tar.gz &&    tar xvfz stringtie-${STRINGTIE_V}.Linux_x86_64.tar.gz &&     cd stringtie-${STRINGTIE_V}.Linux_x86_64 &&     mkdir /kb/deployment/bin/StringTie &&     cp -R stringtie /kb/deployment/bin/StringTie/stringtie
+#12 CACHED
+
+#13 [ 9/14] RUN GFFCOMP_V='0.12.2' &&     cd /kb/deployment/bin/modules &&     mkdir gffcompare && cd gffcompare &&     wget https://ccb.jhu.edu/software/stringtie/dl/gffcompare-${GFFCOMP_V}.Linux_x86_64.tar.gz	 &&    tar xvfz gffcompare-${GFFCOMP_V}.Linux_x86_64.tar.gz	 &&     cd gffcompare-${GFFCOMP_V}.Linux_x86_64	 &&     mkdir /kb/deployment/bin/gffcompare &&     cp -R gffcompare /kb/deployment/bin/gffcompare/gffcompare
+#13 CACHED
+
+#14 [10/14] COPY ./ /kb/module
+#14 DONE 0.4s
+
+#15 [11/14] RUN mkdir -p /kb/module/work
+#15 DONE 0.5s
+
+#16 [12/14] RUN chmod -R a+rw /kb/module
+#16 DONE 1.7s
+
+#17 [13/14] WORKDIR /kb/module
+#17 DONE 0.1s
+
+#18 [14/14] RUN make all
+#18 0.379 kb-sdk compile kb_stringtie.spec \
+#18 0.379 	--out lib \
+#18 0.379 	--plclname kb_stringtie::kb_stringtieClient \
+#18 0.379 	--jsclname javascript/Client \
+#18 0.379 	--pyclname kb_stringtie.kb_stringtieClient \
+#18 0.379 	--javasrc src \
+#18 0.379 	--java \
+#18 0.379 	--pysrvname kb_stringtie.kb_stringtieServer \
+#18 0.379 	--pyimplname kb_stringtie.kb_stringtieImpl;
+#18 0.655 KBase SDK version 1.0.18 (commit f9f9e90b77d11dd9f92f8117dc2804b7d6ffef4e)
+#18 1.428 chmod +x scripts/entrypoint.sh
+#18 1.442 mkdir -p bin
+#18 1.446 echo '#!/bin/bash' > scripts/start_server.sh
+#18 1.451 echo 'script_dir=$(dirname "$(readlink -f "$0")")' >> scripts/start_server.sh
+#18 1.453 echo 'export KB_DEPLOYMENT_CONFIG=$script_dir/../deploy.cfg' >> scripts/start_server.sh
+#18 1.456 echo 'export PYTHONPATH=$script_dir/../lib:$PATH:$PYTHONPATH' >> scripts/start_server.sh
+#18 1.458 echo 'uwsgi --master --processes 5 --threads 5 --http :5000 --wsgi-file $script_dir/../lib/kb_stringtie/kb_stringtieServer.py' >> scripts/start_server.sh
+#18 1.460 chmod +x scripts/start_server.sh
+#18 1.462 mkdir -p bin
+#18 1.465 echo '#!/bin/bash' > bin/run_kb_stringtie_async_job.sh
+#18 1.473 echo 'script_dir=$(dirname "$(readlink -f "$0")")' >> bin/run_kb_stringtie_async_job.sh
+#18 1.475 echo 'export PYTHONPATH=$script_dir/../lib:$PATH:$PYTHONPATH' >> bin/run_kb_stringtie_async_job.sh
+#18 1.477 echo 'python -u $script_dir/../lib/kb_stringtie/kb_stringtieServer.py $1 $2 $3' >> bin/run_kb_stringtie_async_job.sh
+#18 1.479 chmod +x bin/run_kb_stringtie_async_job.sh
+#18 1.481 echo '#!/bin/bash' > test/run_tests.sh
+#18 1.491 echo 'script_dir=$(dirname "$(readlink -f "$0")")' >> test/run_tests.sh
+#18 1.493 echo 'export KB_DEPLOYMENT_CONFIG=$script_dir/../deploy.cfg' >> test/run_tests.sh
+#18 1.495 echo 'export KB_AUTH_TOKEN=`cat /kb/module/work/token`' >> test/run_tests.sh
+#18 1.496 echo 'export PYTHONPATH=$script_dir/../lib:$PATH:$PYTHONPATH' >> test/run_tests.sh
+#18 1.498 echo 'cd $script_dir/../test' >> test/run_tests.sh
+#18 1.500 echo 'python -m nose --with-coverage --cover-package=kb_stringtie --cover-html --cover-html-dir=/kb/module/work/test_coverage --cover-xml --cover-xml-file=/kb/module/work/test_coverage/coverage.xml --nocapture  --nologcapture .  ' >> test/run_tests.sh
+#18 1.502 chmod +x test/run_tests.sh
+#18 DONE 1.5s
+
+#19 exporting to image
+#19 exporting layers
+#19 exporting layers 0.4s done
+#19 writing image sha256:e0b72a602aaeb5c629b082412e574413b1eb06b8fe37ca664c3f4d748af91bd2 done
+#19 naming to docker.io/test/kb_stringtie:latest 0.0s done
+#19 DONE 0.5s
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - MaintainerDeprecated: Maintainer instruction is deprecated in favor of using label (line 2)
+Delete old Docker image
+Deleted: sha256:b84770b2013e22e962ba822876fe85fe9a9a95734c7321aedf28f7a910551497
+
+./scripts/entrypoint.sh: line 3: /kb/deployment/user-env.sh: No such file or directory
+Run Tests
+if [ ! -f /kb/module/work/token ]; then echo -e '\nOutside a docker container please run "kb-sdk test" rather than "make test"\n' && exit 1; fi
+bash test/run_tests.sh
+1783530583.84 - CallbackServer: Subjob method: AssemblyUtil.get_assembly_as_fasta JobID: 8d777d64-9343-44d9-ac5d-5c765be8f700
+1783530584.26 - CallbackServer: Running module AssemblyUtil:
+url: https://github.com/kbaseapps/AssemblyUtil
+commit: 59855bcb24014c3030e146b98c8d3e70abac1fa1
+version: 3.0.0
+release: release
+
+downloading ws object data (77518/2/1;1745/511/31)
+1783530585.94 - CallbackServer: Subjob method: DataFileUtil.get_objects JobID: d91dd25e-1529-44d3-aa25-473472bf7e82
+1783530586.21 - CallbackServer: Running module DataFileUtil:
+url: https://github.com/kbaseapps/DataFileUtil
+commit: 0d855560a37f8787ab3bb67e464b9c94b299764e
+version: 0.2.1
+release: release
+
+1783530587.428437: Shock url: https://appdev.kbase.us/services/shock-api
+1783530589.53 - CallbackServer: Subjob method: DataFileUtil.shock_to_file JobID: 4cb2f195-2bc3-408a-b71c-cee41778213a
+1783530589.53 - CallbackServer: WARNING: Module DataFileUtil was already used once for this job. Using cached version:
+url: https://github.com/kbaseapps/DataFileUtil
+commit: 0d855560a37f8787ab3bb67e464b9c94b299764e
+version: 0.2.1
+release: release
+
+1783530591.2683146: Shock url: https://appdev.kbase.us/services/shock-api
+1783530591.5767612: Fetching info for handle: KBH_237987
+1783530592.2459726: downloading shock node 237115bc-8055-4a8e-a213-265301de3998 into file: /kb/module/work/tmp/Athaliana_TAIR10.assembly.fa
+1783530594.8655822: downloading done
+1783530601.55 - CallbackServer: Subjob method: GenomeFileUtil.genome_to_gff JobID: 6869233b-11a2-44ae-bee4-7e7745b73720
+1783530601.97 - CallbackServer: Running module GenomeFileUtil:
+url: https://github.com/kbaseapps/GenomeFileUtil
+commit: c8c6948e0bebb9f0a6e95abe057af62b3ca57195
+version: 0.11.6
+release: release
+
+genome_to_gff -- paramaters = 
+{'genome_ref': '77518/2/1', 'target_dir': '/kb/module/work/tmp'}
+1783530603.582051 INFO: fetching genome object
+1783530603.59 - CallbackServer: Subjob method: WsLargeDataIO.get_objects JobID: ba4b3485-0e5f-4457-aa68-fae50f647d21
+1783530603.85 - CallbackServer: Running module WsLargeDataIO:
+url: https://github.com/kbaseapps/WsLargeDataIO
+commit: 2a754eccec87112905cad0c6c69feecd95f6894d
+version: 0.0.4
+release: beta
+
+JsonServerSyslog using package name us.kbase
+WsLargeDataIO got SDK_CALLBACK_URL http://172.17.0.2:39469
+Creating file: /kb/module/work/tmp/Arabidopsis_thaliana.gff
+export complete -- result = 
+{'file_path': '/kb/module/work/tmp/Arabidopsis_thaliana.gff', 'from_cache': 0}
+SS......Command line was:
+/kb/deployment/bin/gffread/gffread -E /kb/module/work/tmp/Arabidopsis_thaliana.gff -T -o /kb/module/work/tmp/Arabidopsis_thaliana.gtf
+   .. loaded 35386 genomic features from /kb/module/work/tmp/Arabidopsis_thaliana.gff
+E.S.
+======================================================================
+ERROR: test_run_stringtie_app_mix_with_long_read_alignment (kb_stringtie_server_test.kb_stringtieTest)
+Test workspace was deleted----------------------------------------------------------------------
+
+Traceback (most recent call last):
+1783530573.68: generated stringtie command: /kb/deployment/bin/StringTie/stringtie -o out.gtf -A genes.tsv -L   long_reads.bam   File "/kb/module/test/kb_stringtie_server_test.py", line 520, in test_run_stringtie_app_mix_with_long_read_alignment
+
+1783530573.68: generated stringtie command: /kb/deployment/bin/StringTie/stringtie -o out.gtf -A genes.tsv --mix   short_reads.bam long_reads.bam     result = self.getImpl().run_stringtie_app(self.getContext(), input_params)[0]
+
+--->  File "/kb/module/lib/kb_stringtie/kb_stringtieImpl.py", line 112, in run_stringtie_app
+
+Running kb_stringtie.run_stringtie    returnVal = stringtie_runner.run_stringtie_app(params)
+
+params:  File "/kb/module/lib/kb_stringtie/Utils/StringTieUtil.py", line 1271, in run_stringtie_app
+
+{    returnVal = self._process_alignment_set_object(params)
+
+  File "/kb/module/lib/kb_stringtie/Utils/StringTieUtil.py", line 912, in _process_alignment_set_object "alignment_object_ref": "77518/31/1",
+
+    long_read_alignment_set = self.set_client.get_reads_alignment_set_v1( "workspace_name": "keenholdhc:narrative_1783354693345",
+
+  File "/kb/module/lib/installed_clients/SetAPIServiceClient.py", line 901, in get_reads_alignment_set_v1 "expression_suffix": "_expression",
+
+    return self._client.call_method('SetAPI.get_reads_alignment_set_v1', "expression_set_suffix": "_expression_set",
+
+  File "/kb/module/lib/installed_clients/baseclient.py", line 282, in call_method
+ "mix_mode": 1,    return self._call(url, service_method, args, context)
+
+ "long_read_mode": 1,  File "/kb/module/lib/installed_clients/baseclient.py", line 187, in _call
+
+ "long_read_alignment_object_ref": "77518/26/2"    raise ServerError(**err['error'])
+}
+
+1783530573.69: --->installed_clients.baseclient.ServerError: Server error: -32000. 'mapped_alignments_ids'
+
+running StringTieUtil.run_stringtieTraceback (most recent call last):
+
+params:  File "/kb/module/scripts/../lib/SetAPI/SetAPIServer.py", line 101, in _call_method
+
+{    result = method(ctx, *params)
+
+ "alignment_object_ref": "77518/31/1",  File "/kb/module/lib/SetAPI/SetAPIImpl.py", line 1007, in get_reads_alignment_set_v1
+
+    returnVal = rasi.get_reads_alignment_set(ctx, params) "workspace_name": "keenholdhc:narrative_1783354693345",
+
+  File "/kb/module/lib/SetAPI/readsalignment/ReadsAlignmentSetInterfaceV1.py", line 106, in get_reads_alignment_set "expression_suffix": "_expression",
+
+    reads_to_alignments = obj["mapped_alignments_ids"] "expression_set_suffix": "_expression_set",
+
+KeyError: 'mapped_alignments_ids'
+
+
+Name                                  Stmts   Miss  Cover "mix_mode": 1,
+
+---------------------------------------------------------
+ "long_read_mode": 1,kb_stringtie/Utils/StringTieUtil.py     546    379    31%
+ "long_read_alignment_object_ref": "77518/26/2"
+
+kb_stringtie/Utils/__init__.py            0      0   100%}
+
+kb_stringtie/Utils/file_utils.py         90     39    57%1783530573.69: start validating run_stringtie params
+
+kb_stringtie/__init__.py                  0      0   100%--->
+
+kb_stringtie/authclient.py               59     19    68%Running kb_stringtie.run_stringtie
+kb_stringtie/kb_stringtieImpl.py         26      5    81%
+
+kb_stringtie/kb_stringtieServer.py      372    275    26%
+params:---------------------------------------------------------
+
+{TOTAL                                  1093    717    34%
+
+----------------------------------------------------------------------
+Ran 12 tests in 168.259s "alignment_object_ref": "77518/31/1",
+
+
+ "workspace_name": "keenholdhc:narrative_1783354693345",FAILED (SKIP=3, errors=1)
+
+ "expression_suffix": "_expression",
+ "expression_set_suffix": "_expression_set",
+ "mix_mode": 1
+}
+1783530573.69: --->
+running StringTieUtil.run_stringtie
+params:
+{
+ "alignment_object_ref": "77518/31/1",
+ "workspace_name": "keenholdhc:narrative_1783354693345",
+ "expression_suffix": "_expression",
+ "expression_set_suffix": "_expression_set",
+ "mix_mode": 1
+}
+1783530573.69: start validating run_stringtie params
+OBJECT INFO: [31, 'WT_SS_alignment_set', 'KBaseSets.ReadsAlignmentSet-2.2', '2026-07-07T19:31:32+0000', 1, 'keenholdhc', 77518, 'keenholdhc:narrative_1783354693345', 'dd72afc9f0b41d5f19cc067c44e425d1', 134, None]
+LONG READ OBJECT INFO: [26, 'AT_N_S_1_alignment', 'KBaseRNASeq.RNASeqAlignment-4.0', '2026-07-07T19:52:21+0000', 2, 'keenholdhc', 77518, 'keenholdhc:narrative_1783354693345', '882a603dc4286677bd3a83a4458251c8', 1042, None]
+SHORT SET DATA: {
+  "description": "Alignments using HISAT2, v.2.1.0",
+  "items": [
+    {
+      "label": "Rep_1",
+      "ref": "77518/30/1"
+    },
+    {
+      "label": "Rep_1",
+      "ref": "77518/29/1"
+    }
+  ]
+}
+LONG SET DATA: {
+  "aligned_using": "hisat2",
+  "aligner_opts": {
+    "alignment_suffix": "_alignment",
+    "alignmentset_suffix": "_alignment_set",
+    "build_report": "0",
+    "condition": "Rep_1",
+    "genome_ref": "77518/2/1",
+    "max_intron_length": "500000",
+    "min_intron_length": "20",
+    "no_spliced_alignment": "0",
+    "np": "1",
+    "num_threads": "2",
+    "orientation": "fr",
+    "quality_score": "phred33",
+    "sampleset_ref": "77518/24/2;77518/8/1",
+    "skip": "0",
+    "tailor_alignments": "dta-cufflinks",
+    "trim3": "0",
+    "trim5": "0",
+    "ws_name": "keenholdhc:narrative_1783354693345"
+  },
+  "aligner_version": "2.1.0",
+  "alignment_stats": {
+    "alignment_rate": 0.055,
+    "mapped_reads": 25,
+    "multiple_alignments": 5,
+    "properly_paired": 0,
+    "singletons": 0,
+    "total_reads": 45056,
+    "unmapped_reads": 45031
+  },
+  "condition": "Rep_1",
+  "file": {
+    "file_name": "accepted_hits.bam",
+    "hid": "KBH_251733",
+    "id": "2cc3cf4f-b01c-4e07-a68e-e2fbb0f21ebf",
+    "remote_md5": "ba6320f46b3ee4df4b7e11f00e172a86",
+    "type": "shock",
+    "url": "https://appdev.kbase.us/services/shock-api"
+  },
+  "genome_id": "77518/2/1",
+  "library_type": "KBaseFile.SingleEndLibrary-2.1",
+  "read_sample_id": "77518/24/2;77518/8/1",
+  "size": 4045037
+}
+--->
+Running kb_stringtie.run_stringtie
+params:
+{
+ "alignment_object_ref": "77518/31/1",
+ "long_read_alignment_object_ref": "77518/26/2",
+ "workspace_name": "keenholdhc:narrative_1783354693345",
+ "expression_suffix": "_mix_expression",
+ "expression_set_suffix": "_mix_expression_set",
+ "mix_mode": 1,
+ "long_read_mode": 0,
+ "num_threads": 2
+}
+1783530575.49: --->
+running StringTieUtil.run_stringtie
+params:
+{
+ "alignment_object_ref": "77518/31/1",
+ "long_read_alignment_object_ref": "77518/26/2",
+ "workspace_name": "keenholdhc:narrative_1783354693345",
+ "expression_suffix": "_mix_expression",
+ "expression_set_suffix": "_mix_expression_set",
+ "mix_mode": 1,
+ "long_read_mode": 0,
+ "num_threads": 2
+}
+1783530575.49: start validating run_stringtie params
+1783530575.62: start processing AlignmentSet object
+params:
+{
+ "alignment_object_ref": "77518/31/1",
+ "long_read_alignment_object_ref": "77518/26/2",
+ "workspace_name": "keenholdhc:narrative_1783354693345",
+ "expression_suffix": "_mix_expression",
+ "expression_set_suffix": "_mix_expression_set",
+ "mix_mode": 1,
+ "long_read_mode": 0,
+ "num_threads": 2,
+ "alignment_set_ref": "77518/31/1",
+ "ballgown_mode": 1,
+ "skip_reads_with_no_ref": 1,
+ "exchange_gene_ids": 0
+}
+1783530583.74: Found contig reference: 1745/511/31
+1783530583.74: Generating GFF file from Genome
+1783530733.43: converting gff to gtf
+1783530733.43: start executing command:
+/kb/deployment/bin/gffread/gffread -E /kb/module/work/tmp/Arabidopsis_thaliana.gff -T -o /kb/module/work/tmp/Arabidopsis_thaliana.gtf
+1783530735.23: Executed command:
+/kb/deployment/bin/gffread/gffread -E /kb/module/work/tmp/Arabidopsis_thaliana.gff -T -o /kb/module/work/tmp/Arabidopsis_thaliana.gtf
+Exit Code: 0
+Output:
+b''
+1783530735.23: gtf file : /kb/module/work/tmp/Arabidopsis_thaliana.gtf
+1783530739.57: updating transcripts.gtf 
+make: *** [Makefile:64: test] Error 1
+Shutting down callback server...
+1783530740.39 - CallbackServer: Shutting down executor service
