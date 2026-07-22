@@ -60,11 +60,9 @@ class StringTieUtil:
         "min_length": "-m",
         "min_read_coverage": "-c",
         "min_isoform_abundance": "-f",
-        "mix_mode": "--mix",
-        "long_read_mode": "-L"        
     }
 
-    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref", "mix_mode", "long_read_mode"]
+    BOOLEAN_OPTIONS = ["disable_trimming", "ballgown_mode", "skip_reads_with_no_ref"]
 
     def _validate_run_stringtie_params(self, params):
         """
@@ -105,33 +103,14 @@ class StringTieUtil:
 
         command = self.STRINGTIE_TOOLKIT_PATH + "/stringtie "
 
-        # check that one mode is selected 
-        if params.get("mix_mode") and params.get("long_read_mode"):
-            raise ValueError(
-                "mix_mode and long_read_mode cannot both be enabled"
-            )
-
-        # if mix_mode is selected, long_read_input_file is required
-        if params.get("mix_mode") and not params.get("long_read_input_file"):
-            raise ValueError(
-                "long_read_input_file is required when mix_mode is selected"
-            )
-
         for key, option in list(self.OPTIONS_MAP.items()):
             option_value = params.get(key)
             if key in self.BOOLEAN_OPTIONS and option_value:
                 option_value = " "
             if option_value:
                 command += "{} {} ".format(option, option_value)
-                
-        # if mix_mode is selected, add both input BAM files 
-        if params.get("mix_mode"):
-            command += "{} {} ".format(
-                params.get("input_file"),
-                params.get("long_read_input_file")
-            )
-        else:                
-            command += "{} ".format(params.get("input_file"))
+
+        command += "{} ".format(params.get("input_file"))
 
         log("generated stringtie command: {}".format(command))
 
@@ -380,7 +359,7 @@ class StringTieUtil:
             "source_dir": result_directory,
             "alignment_ref": alignment_ref,
             "tool_used": "StringTie",
-            "tool_version": "3.0.3",
+            "tool_version": "1.3.3",
             "genome_ref": genome_ref,
             "transcripts": transcripts,
             "generate_data_only": generate_data_only
@@ -795,22 +774,6 @@ class StringTieUtil:
         params["input_file"] = self._get_input_file(alignment_ref)
         log("using {} as reference annotation file.".format(params.get("gtf_file")))
 
-        # get long-read BAM file either a paired alignment or a single alignment object
-        if params.get("mix_mode"):
-            long_read_alignment_ref = (
-                params.get("long_read_alignment_ref")
-                or params.get("long_read_alignment_object_ref")
-            )
-            if not long_read_alignment_ref:
-                raise ValueError(
-                    "long_read_alignment_object_ref is required when mix_mode is selected."
-                )
-
-            params["long_read_input_file"] = self._get_input_file(long_read_alignment_ref)
-            log("using {} as long-read input file.".format(params["long_read_input_file"]))
-
-        log("using {} as reference annotation file.".format(params.get("gtf_file")))
-
         # output files
         self.output_transcripts = "transcripts.gtf"
         params["output_transcripts"] = os.path.join(
@@ -904,62 +867,11 @@ class StringTieUtil:
             return returnVal
 
         mul_processor_params = []
-        
-        # if in mix_mode, pair each short-read alignment with its corresponding long-read alignment 
-        if params.get("mix_mode"):
-            long_read_alignment_set_ref = params.get("long_read_alignment_object_ref")
-
-            long_read_alignment_set = self.set_client.get_reads_alignment_set_v1(
-                {
-                    "ref": long_read_alignment_set_ref,
-                    "include_item_info": 0,
-                    "include_set_item_ref_paths": 1,
-                }
-            )
-
-            short_items = alignment_set["data"]["items"]
-            long_items = long_read_alignment_set["data"]["items"]
-
-            # files must have same number of alignments
-            if len(short_items) != len(long_items):
-                raise ValueError(
-                    "Short-read and long-read alignment sets must contain the same number of alignments"
-                    "({} vs {})".format(len(short_items), len(long_items))
-                )
-            for short_alignment, long_alignment in zip(short_items, long_items):
-                alignment_upload_params = params.copy()
-                alignment_upload_params["alignment_ref"] = short_alignment["ref_path"]
-                alignment_upload_params["long_read_alignment_ref"] = long_alignment["ref_path"]
-                mul_processor_params.append(alignment_upload_params)    
-
-            # long_alignment_by_label = {}
-
-            # for long_alignment in long_items:
-            #     long_label = long_alignment["label"]
-            #     long_alignment_by_label[long_label] = long_alignment["ref_path"]
-
-            # for short_alignment in short_items:
-            #     short_alignment_ref = short_alignment["ref_path"]
-            #     short_label = short_alignment["label"]
-
-            #     if short_label not in long_alignment_by_label:
-            #         raise ValueError(
-            #             "No matching long-read alignment found for condition {}".format(short_label)
-            #         )
-
-            #     alignment_upload_params = params.copy()
-            #     alignment_upload_params["alignment_ref"] = short_alignment_ref
-            #     alignment_upload_params["long_read_alignment_ref"] = long_alignment_by_label[short_label]
-
-            #     mul_processor_params.append(alignment_upload_params)
-
-        # if not in mix_mode, process each alignment individually
-        else:
-            for alignment in alignment_set["data"]["items"]:
-                alignment_ref = alignment["ref_path"]
-                alignment_upload_params = params.copy()
-                alignment_upload_params["alignment_ref"] = alignment_ref
-                mul_processor_params.append(alignment_upload_params)
+        for alignment in alignment_set["data"]["items"]:
+            alignment_ref = alignment["ref_path"]
+            alignment_upload_params = params.copy()
+            alignment_upload_params["alignment_ref"] = alignment_ref
+            mul_processor_params.append(alignment_upload_params)
 
         cpus = min(params.get("num_threads"), multiprocessing.cpu_count())
         pool = Pool(ncpus=cpus)
@@ -1153,7 +1065,7 @@ class StringTieUtil:
                 "generate_ws_object": True,
                 "exchange_gene_ids": 0,
                 "ballgown_mode": 1,
-                "skip_reads_with_no_ref": 0,
+                "skip_reads_with_no_ref": 1,
             }
         )
         returnVal = self._process_alignment_set_object(params)
@@ -1226,15 +1138,6 @@ class StringTieUtil:
         )
 
         self._validate_run_stringtie_params(params)
-
-        # check for conflicting modes
-        if params.get("mix_mode") and params.get("long_read_mode"):
-            raise ValueError("mix_mode and long_read_mode cannot both be enabled")
-
-        if params.get("mix_mode") and not params.get("long_read_alignment_object_ref"):
-            raise ValueError(
-                "long_read_alignment_object_ref is required when mix_mode is selected"
-            )      
         if (
             isinstance(params.get("novel_isoforms"), dict)
             and "transcript_label" in params["novel_isoforms"]
